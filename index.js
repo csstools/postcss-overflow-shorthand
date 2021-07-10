@@ -1,14 +1,9 @@
-import { list } from 'postcss';
-
-// space-separated values splitter
-const { space } = list
-
 // overflow shorthand property matcher
 const overflowPropertyRegExp = /^overflow/i;
 
-function onCSSDeclaration(decl, preserve) {
+function onCSSDeclaration(postcssList, decl, preserve) {
 	// split the declaration values
-	const [overflowX, overflowY, ...invalidatingValues] = space(decl.value);
+	const [overflowX, overflowY, ...invalidatingValues] = postcssList.space(decl.value);
 
 	// if there are two values, but no invalidating values
 	if (overflowY && !invalidatingValues.length) {
@@ -35,9 +30,9 @@ const creator = opts => {
 
 	return {
 		postcssPlugin: 'postcss-overflow-shorthand',
-		Declaration: (decl) => {
+		Declaration: (decl, { list }) => {
 			if (overflowPropertyRegExp.test(decl)) {
-				onCSSDeclaration(decl, preserve);
+				onCSSDeclaration(list, decl, preserve);
 			}
 		},
 	}
